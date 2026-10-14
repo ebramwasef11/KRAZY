@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Free AI Chatbot</title>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; background-color: #121212; color: white; }
+        #chatbox { height: 400px; border: 1px solid #333; overflow-y: scroll; padding: 15px; margin-bottom: 15px; background: #1e1e1e; border-radius: 8px; }
+        #userInput { width: 75%; padding: 10px; border-radius: 4px; border: 1px solid #444; background: #2a2a2a; color: white; }
+        button { width: 20%; padding: 10px; border-radius: 4px; border: none; background: #007bff; color: white; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h2>My Personal AI Chat</h2>
+    <div id="chatbox"></div>
+    <input type="text" id="userInput" placeholder="Ask something...">
+    <button onclick="askAI()">Send</button>
+
+    <script>
+        async function askAI() {
+            const input = document.getElementById('userInput').value;
+            if(!input) return;
+            const chatbox = document.getElementById('chatbox');
+            chatbox.innerHTML += `<p><b>You:</b> ${input}</p>`;
+            
+            // Connect to Google's free Gemini API endpoint
+            const apiKey = "PASTE_YOUR_GEMINI_API_KEY_HERE"; 
+            const url = `https://googleapis.com{apiKey}`;
+
+            try {
+                const response = await fetch(url, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: input }] }]
+                    })
+                });
+                
+                const data = await response.json();
+                const aiReply = data.candidates[0].content.parts[0].text;
+                chatbox.innerHTML += `<p style="color: #4af586;"><b>AI:</b> ${aiReply}</p>`;
+            } catch (error) {
+                chatbox.innerHTML += `<p style="color: red;"><b>Error:</b> Could not connect. Check your API key.</p>`;
+            }
+            document.getElementById('userInput').value = '';
+            chatbox.scrollTop = chatbox.scrollHeight;
+        }
+    </script>
+</body>
+</html>
