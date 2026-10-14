@@ -23,24 +23,25 @@
             const chatbox = document.getElementById('chatbox');
             chatbox.innerHTML += `<p><b>You:</b> ${input}</p>`;
             
-            // Connect to Google's free Gemini API endpoint
-            const apiKey = "PASTE_YOUR_GEMINI_API_KEY_HERE"; 
-            const url = `https://googleapis.com{apiKey}`;
+            // Put your Hugging Face Token between the quotes below
+            const hfToken = "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"; 
+            const url = "https://huggingface.co";
 
             try {
                 const response = await fetch(url, {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: input }] }]
-                    })
+                    headers: { 
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${hfToken}`
+                    },
+                    body: JSON.stringify({ inputs: input })
                 });
                 
                 const data = await response.json();
-                const aiReply = data.candidates[0].content.parts[0].text;
+                const aiReply = data[0]?.generated_text || data.generated_text || "No response received.";
                 chatbox.innerHTML += `<p style="color: #4af586;"><b>AI:</b> ${aiReply}</p>`;
             } catch (error) {
-                chatbox.innerHTML += `<p style="color: red;"><b>Error:</b> Could not connect. Check your API key.</p>`;
+                chatbox.innerHTML += `<p style="color: red;"><b>Error:</b> Could not connect. Check your token.</p>`;
             }
             document.getElementById('userInput').value = '';
             chatbox.scrollTop = chatbox.scrollHeight;
